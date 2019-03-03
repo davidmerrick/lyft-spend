@@ -1,4 +1,8 @@
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+# Todo:
+
+- Set up a serverless deployment with CloudFront: https://www.serverlessops.io/blog/static-websites-on-aws-s3-with-serverless-framework
+
+this project was bootstrapped with [create react app](https://github.com/facebook/create-react-app).
 
 ## Available Scripts
 
