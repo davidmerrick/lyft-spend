@@ -13,7 +13,9 @@ class App extends Component {
         <div>
           <AppBar position="static">
             <Toolbar>
-              <Typography variant="h5">Lyft Spend</Typography>
+              <Typography variant="h5" color="inherit">
+                Lyft Spend
+              </Typography>
             </Toolbar>
           </AppBar>
           <Route exact path="/" component={Dashboard} />
