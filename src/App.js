@@ -1,8 +1,10 @@
 import React, { Component } from "react";
-import { Typography, AppBar, Toolbar, Button } from "@material-ui/core";
+import { Typography, AppBar, Toolbar } from "@material-ui/core";
 import { HashRouter, Route } from "react-router-dom";
 import Login from "./components/Login";
+import Dashboard from "./components/Dashboard";
 import "./App.css";
+import Callback from "./components/Callback";
 
 class App extends Component {
   render() {
@@ -14,7 +16,9 @@ class App extends Component {
               <Typography variant="h5">Lyft Spend</Typography>
             </Toolbar>
           </AppBar>
-          <Route exact path="/" component={Login} />
+          <Route exact path="/" component={Dashboard} />
+          <Route exact path="/login" component={Login} />
+          <Route exact path="/callback" component={Callback} />
         </div>
       </HashRouter>
     );
