@@ -3,7 +3,6 @@ import { Typography, Button } from "@material-ui/core";
 import queryString from "query-string";
 import { Redirect } from "react-router-dom";
 import { connect } from "react-redux";
-import { openLyftSignIn } from "../actions/Actions";
 import * as lyft from "../models/Lyft";
 
 const mapStateToProps = state => ({
