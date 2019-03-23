@@ -1,28 +1,74 @@
 service: lyft-spend
 
-provider:
-  name: aws
-  runtime: nodejs6.10
-
-functions:
-  helloWorld:
-    handler: handler.helloWorld
-    events:
-      - http:
-          path: hello-world
-          method: get
-          cors: true
+frameworkVersion: ">=1.2.0 <2.0.0"
 
 plugins:
-  - serverless-s3-sync
+  - serverless-finch
+
+custom:
+  client:
+    bucketName: lyft-spend
+    distributionFolder: build
+
+provider:
+  name: aws
+  region: us-west-2
+  runtime: nodejs9.10
 
 resources:
   Resources:
-    StaticSite:
+    s3Bucket:
       Type: AWS::S3::Bucket
       Properties:
+        BucketName: ${self:custom.client.bucketName}
         AccessControl: PublicRead
-        BucketName: ${self:custom.siteName}
         WebsiteConfiguration:
           IndexDocument: index.html
+          ErrorDocument: index.html
+        CorsConfiguration:
+          CorsRules:
+            - AllowedMethods:
+                - GET
+              AllowedOrigins:
+                - "*"
+              AllowedHeaders:
+                - "*"
+    WebAppCloudFrontDistribution:
+      Type: AWS::CloudFront::Distribution
+      Properties:
+        DistributionConfig:
+          Origins:
+            - DomainName: ${self:custom.client.bucketName}.s3.amazonaws.com
+              Id: WebApp
+              CustomOriginConfig:
+                HTTPPort: 80
+                HTTPSPort: 443
+                OriginProtocolPolicy: https-only
+          Enabled: "true"
+          DefaultRootObject: index.html
+          CustomErrorResponses:
+            - ErrorCode: 404
+              ResponseCode: 200
+              ResponsePagePath: /index.html
+          DefaultCacheBehavior:
+            AllowedMethods:
+              - DELETE
+              - GET
+              - HEAD
+              - OPTIONS
+              - PATCH
+              - POST
+              - PUT
+            TargetOriginId: WebApp
+            ForwardedValues:
+              QueryString: "false"
+              Cookies:
+                Forward: none
+            ViewerProtocolPolicy: redirect-to-https
+          ViewerCertificate:
+            CloudFrontDefaultCertificate: "true"
 
+Outputs:
+  WebAppCloudFrontDistributionOutput:
+    Value:
+      "Fn::GetAtt": [WebAppCloudFrontDistribution, DomainName]

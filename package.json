@@ -36,7 +36,8 @@
     "eslint-plugin-prettier": "^3.0.1",
     "prettier": "^1.16.4",
     "prettier-eslint": "^8.8.2",
-    "serverless": "^1.38.0",
+    "serverless": "^1.39.1",
+    "serverless-finch": "^2.4.2",
     "serverless-s3-sync": "^1.7.3"
   }
 }
