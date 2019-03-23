@@ -2,20 +2,18 @@ import React, { Component } from "react";
 import { Typography, Button } from "@material-ui/core";
 import queryString from "query-string";
 import { Redirect } from "react-router-dom";
-import * as lyft from "../models/Lyft";
+import { connect } from "react-redux";
+import { openLyftSignIn } from "../actions/Actions";
+
+const mapStateToProps = state => ({
+  ...state
+});
+
+const mapDispatchToProps = dispatch => ({
+  openLyftSignIn: () => dispatch(openLyftSignIn())
+});
 
 class Login extends Component {
-  constructor() {
-    super();
-    this.lyftSignin.bind(this);
-  }
-  lyftSignin(e) {
-    window.open(
-      `https://www.lyft.com/oauth/authorize_app?client_id=${
-        lyft.LYFT_CLIENT_ID
-      }&scope=rides.read&state=foo&response_type=code`
-    );
-  }
   render() {
     const values = queryString.parse(window.location.search);
     if (values.code) {
@@ -26,7 +24,8 @@ class Login extends Component {
         <Typography gutterBottom variant="h5" component="h2">
           Please Log In
         </Typography>
-        <Button color="primary" onClick={this.lyftSignin}>
+        <p>This app needs permissions to access your ride history in Lyft.</p>
+        <Button color="primary" onClick={this.props.openLyftSignIn}>
           Sign in to Lyft
         </Button>
       </div>
@@ -34,4 +33,7 @@ class Login extends Component {
   }
 }
 
-export default Login;
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(Login);
