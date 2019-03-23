@@ -4,7 +4,6 @@ import { Redirect } from "react-router-dom";
 import {
   TextField,
   Typography,
-  FormGroup,
   Button,
   CircularProgress
 } from "@material-ui/core";
@@ -31,8 +30,7 @@ class Dashboard extends Component {
     super(props);
     this.state = {
       startDate: START_OF_MONTH,
-      endDate: TODAY,
-      rides: []
+      endDate: TODAY
     };
     this.handleChange = this.handleChange.bind(this);
     this.getRideHistory = this.getRideHistory.bind(this);
@@ -83,37 +81,36 @@ class Dashboard extends Component {
         <Typography gutterBottom variant="h5" component="h2">
           Calculate your Lyft spend between 2 dates
         </Typography>
-        <FormGroup row>
-          <TextField
-            name="startDate"
-            label="Start date"
-            type="date"
-            defaultValue={START_OF_MONTH}
-            InputLabelProps={{
-              shrink: true
-            }}
-          />
-        </FormGroup>
-        <FormGroup row>
-          <TextField
-            name="endDate"
-            label="End date"
-            type="date"
-            defaultValue={TODAY}
-            InputLabelProps={{
-              shrink: true
-            }}
-          />
-        </FormGroup>
-        <FormGroup row>
-          <Button
-            disabled={this.props.ridesReducer.loading}
-            color="primary"
-            onClick={this.getRideHistory}
-          >
-            Submit
-          </Button>
-        </FormGroup>
+        <TextField
+          name="startDate"
+          label="Start date"
+          disabled={this.props.ridesReducer.loading}
+          type="date"
+          defaultValue={START_OF_MONTH}
+          onChange={this.handleChange}
+          InputLabelProps={{
+            shrink: true
+          }}
+        />
+        <TextField
+          name="endDate"
+          label="End date"
+          disabled={this.props.ridesReducer.loading}
+          type="date"
+          onChange={this.handleChange}
+          defaultValue={TODAY}
+          InputLabelProps={{
+            shrink: true
+          }}
+        />
+        <br />
+        <Button
+          disabled={this.props.ridesReducer.loading}
+          color="primary"
+          onClick={this.getRideHistory}
+        >
+          Submit
+        </Button>
         <br />
         {this.renderRides()}
       </div>

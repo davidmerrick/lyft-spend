@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Typography } from "@material-ui/core";
+import { Typography, CircularProgress } from "@material-ui/core";
 import { connect } from "react-redux";
 import * as lyft from "../models/Lyft";
 import { Redirect } from "react-router-dom";
@@ -71,7 +71,7 @@ class Callback extends Component {
     return (
       <div>
         <Typography gutterBottom variant="h5" component="h2">
-          Handling callback...
+          <CircularProgress size="60" />
         </Typography>
       </div>
     );
