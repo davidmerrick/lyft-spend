@@ -1,5 +1,4 @@
 import * as types from "./ActionTypes";
-import * as lyft from "../models/Lyft";
 
 export const updateToken = newToken => dispatch => {
   dispatch({
@@ -10,26 +9,24 @@ export const updateToken = newToken => dispatch => {
   });
 };
 
-export const openLyftSignIn = () => dispatch => {
-  window.open(
-    `https://www.lyft.com/oauth/authorize_app?client_id=${
-      lyft.LYFT_CLIENT_ID
-    }&scope=rides.read&state=foo&response_type=code`
-  );
-};
-
-export const updateRides = (token, startDate, endDate) => dispatch => {
-  const LIMIT = 50;
-  fetch(
-    `https://api.lyft.com/v1/rides?start_time=${startDate}&end_time=${endDate}&limit=${LIMIT}`,
-    {
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json"
-      }
-    }
-  )
+export const updateRides = (token, startDate, endDate) => dispatch =>
+  new Promise((resolve, reject) => {
+    dispatch({ type: types.LOADING_RIDES });
+    return resolve();
+  })
+    .then(() => {
+      const LIMIT = 50;
+      return fetch(
+        `https://api.lyft.com/v1/rides?start_time=${startDate}&end_time=${endDate}&limit=${LIMIT}`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json"
+          }
+        }
+      );
+    })
     .then(response => {
       if (response.status !== 200) {
         console.error("Bad response");
@@ -45,5 +42,8 @@ export const updateRides = (token, startDate, endDate) => dispatch => {
           rides: jsonData.ride_history
         }
       });
+      return Promise.resolve();
+    })
+    .then(() => {
+      dispatch({ type: types.LOADING_RIDES_DONE });
     });
-};

@@ -1,8 +1,7 @@
 import * as types from "../actions/ActionTypes";
 
 const initialState = {
-  token: null,
-  rides: []
+  token: null
 };
 
 const simpleReducer = (state = initialState, action) => {
@@ -11,11 +10,6 @@ const simpleReducer = (state = initialState, action) => {
       return Object.assign({}, state, {
         ...state,
         token: action.payload.token
-      });
-    case types.UPDATE_RIDES:
-      return Object.assign({}, state, {
-        ...state,
-        rides: action.payload.rides
       });
     default:
       return state;

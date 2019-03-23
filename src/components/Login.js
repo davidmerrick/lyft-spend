@@ -4,13 +4,10 @@ import queryString from "query-string";
 import { Redirect } from "react-router-dom";
 import { connect } from "react-redux";
 import { openLyftSignIn } from "../actions/Actions";
+import * as lyft from "../models/Lyft";
 
 const mapStateToProps = state => ({
   ...state
-});
-
-const mapDispatchToProps = dispatch => ({
-  openLyftSignIn: () => dispatch(openLyftSignIn())
 });
 
 class Login extends Component {
@@ -25,7 +22,12 @@ class Login extends Component {
           Please Log In
         </Typography>
         <p>This app needs permissions to access your ride history in Lyft.</p>
-        <Button color="primary" onClick={this.props.openLyftSignIn}>
+        <Button
+          color="primary"
+          href={`https://www.lyft.com/oauth/authorize_app?client_id=${
+            lyft.LYFT_CLIENT_ID
+          }&scope=rides.read&state=foo&response_type=code`}
+        >
           Sign in to Lyft
         </Button>
       </div>
@@ -33,7 +35,4 @@ class Login extends Component {
   }
 }
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(Login);
+export default connect(mapStateToProps)(Login);

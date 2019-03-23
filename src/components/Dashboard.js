@@ -1,7 +1,13 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
 import { Redirect } from "react-router-dom";
-import { TextField, Typography, FormGroup, Button } from "@material-ui/core";
+import {
+  TextField,
+  Typography,
+  FormGroup,
+  Button,
+  CircularProgress
+} from "@material-ui/core";
 import moment from "moment";
 import { updateRides } from "../actions/Actions";
 
@@ -33,7 +39,7 @@ class Dashboard extends Component {
   }
   getRideHistory() {
     this.props.updateRides(
-      this.props.simpleReducer.token,
+      this.props.loginReducer.token,
       this.state.startDate,
       this.state.endDate
     );
@@ -43,16 +49,33 @@ class Dashboard extends Component {
       [e.target.name]: e.target.value
     });
   }
+  getTotalCost() {
+    let { rides } = this.props.ridesReducer;
+    let totalCost = rides
+      .map(ride => ride.price.amount)
+      .reduce((a, b) => a + b);
+    return (totalCost / 100).toFixed(2);
+  }
   renderRides() {
-    let { rides } = this.props.simpleReducer;
+    let { rides, loading } = this.props.ridesReducer;
+    if (loading) {
+      return <CircularProgress />;
+    }
     if (rides.length > 0) {
-      let costArray = rides.map(ride => <div>{ride.line_items.amount}</div>);
-      console.log(costArray);
-      return <div>Total cost: {costArray}</div>;
+      if (rides.length === 50) {
+        return (
+          <div>
+            Note: this app currently doesn't support fetching more than 50
+            rides. Total spend for the first 50 rides between those dates: $
+            {this.getTotalCost()}
+          </div>
+        );
+      }
+      return <div>Total spend: ${this.getTotalCost()}</div>;
     }
   }
   render() {
-    if (!this.props.simpleReducer.token) {
+    if (!this.props.loginReducer.token) {
       return <Redirect to="/login" />;
     }
     return (
@@ -83,7 +106,11 @@ class Dashboard extends Component {
           />
         </FormGroup>
         <FormGroup row>
-          <Button color="primary" onClick={this.getRideHistory}>
+          <Button
+            disabled={this.props.ridesReducer.loading}
+            color="primary"
+            onClick={this.getRideHistory}
+          >
             Submit
           </Button>
         </FormGroup>

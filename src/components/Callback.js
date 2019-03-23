@@ -59,7 +59,7 @@ class Callback extends Component {
       });
   }
   render() {
-    if (this.props.simpleReducer.token) {
+    if (this.props.loginReducer.token) {
       return <Redirect to="/" />;
     }
 
