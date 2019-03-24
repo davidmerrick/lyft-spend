@@ -1,7 +1,7 @@
 Web app that shows how much you spent on Lyft between two dates.
 At the moment, it's limited to 50 rides, but I'll add support for more soon.
 
-Live demo: https://lyft-spend.s3-us-west-2.amazonaws.com/index.html
+Live demo: https://dxy57nrwmlvae.cloudfront.net
 
 # Todo:
 
