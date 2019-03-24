@@ -5,10 +5,13 @@ import {
   TextField,
   Typography,
   Button,
-  CircularProgress
+  CircularProgress,
+  Chip
 } from "@material-ui/core";
+import { red } from "@material-ui/core/colors";
 import moment from "moment";
 import { updateRides } from "../actions/Actions";
+import { withStyles } from "@material-ui/core/styles";
 
 const mapStateToProps = state => ({
   ...state
@@ -17,6 +20,12 @@ const mapStateToProps = state => ({
 const mapDispatchToProps = dispatch => ({
   updateRides: (token, startDate, endDate) =>
     dispatch(updateRides(token, startDate, endDate))
+});
+
+const styles = theme => ({
+  error: {
+    backgroundColor: red[600]
+  }
 });
 
 const START_OF_MONTH = moment()
@@ -30,12 +39,19 @@ class Dashboard extends Component {
     super(props);
     this.state = {
       startDate: START_OF_MONTH,
-      endDate: TODAY
+      endDate: TODAY,
+      error: null
     };
     this.handleChange = this.handleChange.bind(this);
     this.getRideHistory = this.getRideHistory.bind(this);
   }
   getRideHistory() {
+    if (new Date(this.state.startDate) > new Date(this.state.endDate)) {
+      this.setState({
+        error: "Start date must be before end date"
+      });
+      return;
+    }
     this.props.updateRides(
       this.props.loginReducer.token,
       this.state.startDate,
@@ -44,6 +60,7 @@ class Dashboard extends Component {
   }
   handleChange(e) {
     this.setState({
+      error: null,
       [e.target.name]: e.target.value
     });
   }
@@ -70,6 +87,13 @@ class Dashboard extends Component {
         );
       }
       return <div>Total spend: ${this.getTotalCost()}</div>;
+    }
+  }
+  renderError() {
+    if (this.state.error) {
+      return (
+        <Chip label={this.state.error} className={this.props.classes.error} />
+      );
     }
   }
   render() {
@@ -112,6 +136,8 @@ class Dashboard extends Component {
           Submit
         </Button>
         <br />
+        {this.renderError()}
+        <br />
         {this.renderRides()}
       </div>
     );
@@ -121,4 +147,4 @@ class Dashboard extends Component {
 export default connect(
   mapStateToProps,
   mapDispatchToProps
-)(Dashboard);
+)(withStyles(styles)(Dashboard));
