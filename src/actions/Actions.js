@@ -47,3 +47,31 @@ export const updateRides = (token, startDate, endDate) => dispatch =>
     .then(() => {
       dispatch({ type: types.LOADING_RIDES_DONE });
     });
+
+export const updateDates = (startDate, endDate) => dispatch =>
+  new Promise((resolve, reject) => {
+    dispatch({
+      type: types.RESET_RIDES
+    });
+    return resolve();
+  })
+    .then(() => {
+      dispatch({
+        type: types.UPDATE_DATES,
+        payload: {
+          startDate: startDate,
+          endDate: endDate
+        }
+      });
+    })
+    .then(() => {
+      if (new Date(startDate) > new Date(endDate)) {
+        dispatch({
+          type: types.INVALID_START_DATE
+        });
+      } else {
+        dispatch({
+          type: types.VALID_START_DATE
+        });
+      }
+    });

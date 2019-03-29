@@ -5,13 +5,9 @@ import {
   TextField,
   Typography,
   Button,
-  CircularProgress,
-  Chip
+  CircularProgress
 } from "@material-ui/core";
-import { red } from "@material-ui/core/colors";
-import moment from "moment";
-import { updateRides } from "../actions/Actions";
-import { withStyles } from "@material-ui/core/styles";
+import { updateRides, updateDates } from "../actions/Actions";
 
 const mapStateToProps = state => ({
   ...state
@@ -19,50 +15,35 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = dispatch => ({
   updateRides: (token, startDate, endDate) =>
-    dispatch(updateRides(token, startDate, endDate))
+    dispatch(updateRides(token, startDate, endDate)),
+  updateDates: (startDate, endDate) => dispatch(updateDates(startDate, endDate))
 });
-
-const styles = theme => ({
-  error: {
-    backgroundColor: red[600]
-  }
-});
-
-const START_OF_MONTH = moment()
-  .startOf("month")
-  .format("YYYY-MM-DD");
-
-const TODAY = moment().format("YYYY-MM-DD");
 
 class Dashboard extends Component {
   constructor(props) {
     super(props);
-    this.state = {
-      startDate: START_OF_MONTH,
-      endDate: TODAY,
-      error: null
-    };
-    this.handleChange = this.handleChange.bind(this);
+    this.updateStartDate = this.updateStartDate.bind(this);
+    this.updateEndDate = this.updateEndDate.bind(this);
     this.getRideHistory = this.getRideHistory.bind(this);
   }
   getRideHistory() {
-    if (new Date(this.state.startDate) > new Date(this.state.endDate)) {
-      this.setState({
-        error: "Start date must be before end date"
-      });
+    if (this.props.dashboardReducer.startDateError) {
       return;
     }
     this.props.updateRides(
       this.props.loginReducer.token,
-      this.state.startDate,
-      this.state.endDate
+      this.props.dashboardReducer.startDate,
+      this.props.dashboardReducer.endDate
     );
   }
-  handleChange(e) {
-    this.setState({
-      error: null,
-      [e.target.name]: e.target.value
-    });
+  updateStartDate(e) {
+    this.props.updateDates(e.target.value, this.props.dashboardReducer.endDate);
+  }
+  updateEndDate(e) {
+    this.props.updateDates(
+      this.props.dashboardReducer.startDate,
+      e.target.value
+    );
   }
   getTotalCost() {
     let { rides } = this.props.ridesReducer;
@@ -89,13 +70,6 @@ class Dashboard extends Component {
       return <div>Total spend: ${this.getTotalCost()}</div>;
     }
   }
-  renderError() {
-    if (this.state.error) {
-      return (
-        <Chip label={this.state.error} className={this.props.classes.error} />
-      );
-    }
-  }
   render() {
     if (!this.props.loginReducer.token) {
       return <Redirect to="/login" />;
@@ -106,12 +80,13 @@ class Dashboard extends Component {
           Calculate your Lyft spend between 2 dates
         </Typography>
         <TextField
+          error={this.props.dashboardReducer.startDateError}
           name="startDate"
           label="Start date"
           disabled={this.props.ridesReducer.loading}
           type="date"
-          defaultValue={START_OF_MONTH}
-          onChange={this.handleChange}
+          defaultValue={this.props.dashboardReducer.startDate}
+          onChange={this.updateStartDate}
           InputLabelProps={{
             shrink: true
           }}
@@ -121,8 +96,8 @@ class Dashboard extends Component {
           label="End date"
           disabled={this.props.ridesReducer.loading}
           type="date"
-          onChange={this.handleChange}
-          defaultValue={TODAY}
+          onChange={this.updateEndDate}
+          defaultValue={this.props.dashboardReducer.endDate}
           InputLabelProps={{
             shrink: true
           }}
@@ -136,8 +111,6 @@ class Dashboard extends Component {
           Submit
         </Button>
         <br />
-        {this.renderError()}
-        <br />
         {this.renderRides()}
       </div>
     );
@@ -147,4 +120,4 @@ class Dashboard extends Component {
 export default connect(
   mapStateToProps,
   mapDispatchToProps
-)(withStyles(styles)(Dashboard));
+)(Dashboard);
