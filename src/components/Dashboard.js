@@ -5,13 +5,10 @@ import {
   TextField,
   Typography,
   Button,
-  CircularProgress,
-  Chip
+  CircularProgress
 } from "@material-ui/core";
-import { red } from "@material-ui/core/colors";
 import moment from "moment";
 import { updateRides } from "../actions/Actions";
-import { withStyles } from "@material-ui/core/styles";
 
 const mapStateToProps = state => ({
   ...state
@@ -20,12 +17,6 @@ const mapStateToProps = state => ({
 const mapDispatchToProps = dispatch => ({
   updateRides: (token, startDate, endDate) =>
     dispatch(updateRides(token, startDate, endDate))
-});
-
-const styles = theme => ({
-  error: {
-    backgroundColor: red[600]
-  }
 });
 
 const START_OF_MONTH = moment()
@@ -40,16 +31,13 @@ class Dashboard extends Component {
     this.state = {
       startDate: START_OF_MONTH,
       endDate: TODAY,
-      error: null
+      startDateError: false
     };
     this.handleChange = this.handleChange.bind(this);
     this.getRideHistory = this.getRideHistory.bind(this);
   }
   getRideHistory() {
-    if (new Date(this.state.startDate) > new Date(this.state.endDate)) {
-      this.setState({
-        error: "Start date must be before end date"
-      });
+    if (this.state.startDateError) {
       return;
     }
     this.props.updateRides(
@@ -58,11 +46,23 @@ class Dashboard extends Component {
       this.state.endDate
     );
   }
+  validateStartDate() {
+    if (new Date(this.state.startDate) > new Date(this.state.endDate)) {
+      this.setState({
+        startDateError: true
+      });
+    }
+    if (this.state.startDateError) {
+      this.setState({
+        startDateError: false
+      });
+    }
+  }
   handleChange(e) {
     this.setState({
-      error: null,
       [e.target.name]: e.target.value
     });
+    this.validateStartDate();
   }
   getTotalCost() {
     let { rides } = this.props.ridesReducer;
@@ -89,13 +89,6 @@ class Dashboard extends Component {
       return <div>Total spend: ${this.getTotalCost()}</div>;
     }
   }
-  renderError() {
-    if (this.state.error) {
-      return (
-        <Chip label={this.state.error} className={this.props.classes.error} />
-      );
-    }
-  }
   render() {
     if (!this.props.loginReducer.token) {
       return <Redirect to="/login" />;
@@ -106,6 +99,7 @@ class Dashboard extends Component {
           Calculate your Lyft spend between 2 dates
         </Typography>
         <TextField
+          error={this.state.startDateError}
           name="startDate"
           label="Start date"
           disabled={this.props.ridesReducer.loading}
@@ -136,8 +130,6 @@ class Dashboard extends Component {
           Submit
         </Button>
         <br />
-        {this.renderError()}
-        <br />
         {this.renderRides()}
       </div>
     );
@@ -147,4 +139,4 @@ class Dashboard extends Component {
 export default connect(
   mapStateToProps,
   mapDispatchToProps
-)(withStyles(styles)(Dashboard));
+)(Dashboard);
