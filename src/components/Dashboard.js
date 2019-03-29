@@ -7,8 +7,7 @@ import {
   Button,
   CircularProgress
 } from "@material-ui/core";
-import moment from "moment";
-import { updateRides } from "../actions/Actions";
+import { updateRides, updateDates } from "../actions/Actions";
 
 const mapStateToProps = state => ({
   ...state
@@ -16,53 +15,35 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = dispatch => ({
   updateRides: (token, startDate, endDate) =>
-    dispatch(updateRides(token, startDate, endDate))
+    dispatch(updateRides(token, startDate, endDate)),
+  updateDates: (startDate, endDate) => dispatch(updateDates(startDate, endDate))
 });
-
-const START_OF_MONTH = moment()
-  .startOf("month")
-  .format("YYYY-MM-DD");
-
-const TODAY = moment().format("YYYY-MM-DD");
 
 class Dashboard extends Component {
   constructor(props) {
     super(props);
-    this.state = {
-      startDate: START_OF_MONTH,
-      endDate: TODAY,
-      startDateError: false
-    };
-    this.handleChange = this.handleChange.bind(this);
+    this.updateStartDate = this.updateStartDate.bind(this);
+    this.updateEndDate = this.updateEndDate.bind(this);
     this.getRideHistory = this.getRideHistory.bind(this);
   }
   getRideHistory() {
-    if (this.state.startDateError) {
+    if (this.props.dashboardReducer.startDateError) {
       return;
     }
     this.props.updateRides(
       this.props.loginReducer.token,
-      this.state.startDate,
-      this.state.endDate
+      this.props.dashboardReducer.startDate,
+      this.props.dashboardReducer.endDate
     );
   }
-  validateStartDate() {
-    if (new Date(this.state.startDate) > new Date(this.state.endDate)) {
-      this.setState({
-        startDateError: true
-      });
-    }
-    if (this.state.startDateError) {
-      this.setState({
-        startDateError: false
-      });
-    }
+  updateStartDate(e) {
+    this.props.updateDates(e.target.value, this.props.dashboardReducer.endDate);
   }
-  handleChange(e) {
-    this.setState({
-      [e.target.name]: e.target.value
-    });
-    this.validateStartDate();
+  updateEndDate(e) {
+    this.props.updateDates(
+      this.props.dashboardReducer.startDate,
+      e.target.value
+    );
   }
   getTotalCost() {
     let { rides } = this.props.ridesReducer;
@@ -99,13 +80,13 @@ class Dashboard extends Component {
           Calculate your Lyft spend between 2 dates
         </Typography>
         <TextField
-          error={this.state.startDateError}
+          error={this.props.dashboardReducer.startDateError}
           name="startDate"
           label="Start date"
           disabled={this.props.ridesReducer.loading}
           type="date"
-          defaultValue={START_OF_MONTH}
-          onChange={this.handleChange}
+          defaultValue={this.props.dashboardReducer.startDate}
+          onChange={this.updateStartDate}
           InputLabelProps={{
             shrink: true
           }}
@@ -115,8 +96,8 @@ class Dashboard extends Component {
           label="End date"
           disabled={this.props.ridesReducer.loading}
           type="date"
-          onChange={this.handleChange}
-          defaultValue={TODAY}
+          onChange={this.updateEndDate}
+          defaultValue={this.props.dashboardReducer.endDate}
           InputLabelProps={{
             shrink: true
           }}

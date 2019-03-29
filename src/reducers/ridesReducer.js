@@ -12,6 +12,11 @@ const ridesReducer = (state = initialState, action) => {
         ...state,
         rides: action.payload.rides
       });
+    case types.RESET_RIDES:
+      return Object.assign({}, state, {
+        ...state,
+        rides: []
+      });
     case types.LOADING_RIDES:
       return Object.assign({}, state, {
         ...state,
