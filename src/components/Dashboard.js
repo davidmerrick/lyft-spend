@@ -50,7 +50,7 @@ class Dashboard extends Component {
     let totalCost = rides
       .map(ride => ride.price.amount)
       .reduce((a, b) => a + b);
-    return (totalCost / 100).toFixed(2);
+    return totalCost / 100;
   }
   renderRides() {
     let { rides, loading } = this.props.ridesReducer;
@@ -58,16 +58,7 @@ class Dashboard extends Component {
       return <CircularProgress />;
     }
     if (rides.length > 0) {
-      if (rides.length === 50) {
-        return (
-          <div>
-            Note: this app currently doesn't support fetching more than 50
-            rides. Total spend for the first 50 rides between those dates: $
-            {this.getTotalCost()}
-          </div>
-        );
-      }
-      return <div>Total spend: ${this.getTotalCost()}</div>;
+      return <div>Total spend: ${this.getTotalCost().toLocaleString()}</div>;
     }
   }
   render() {
